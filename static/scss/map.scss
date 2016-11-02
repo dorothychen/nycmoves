@@ -3,7 +3,18 @@ html, body {
   padding: 0;
 }
 
+.title {
+  margin-left: 50px;
+  margin-top: 50px;
+  margin-bottom: 0;
+  font-family: sans-serif;
+}
+
 svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+
   path.border {
     stroke: white;
     stroke-width: 0.4px;

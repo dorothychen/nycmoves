@@ -25,7 +25,6 @@ d3.json("static/zones2.json", function(error, nyc) {
         t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
     projection.scale(s).translate(t)
-    console.log(nyc.features.length);
 
     svg.selectAll("path")
         .data(nyc.features)
