@@ -1,4 +1,6 @@
 .DS_Store
 .sass-cache/
+.webassets-cache/
+generated/
 data_taxi/
 data_citibike/

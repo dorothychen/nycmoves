@@ -1,0 +1,15 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  path.border {
+    stroke: white;
+    stroke-width: 0.4px;
+  }
+
+  path.border.hovered {
+    fill-opacity: 0.6;
+  }
+}
