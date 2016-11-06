@@ -3,7 +3,8 @@ from os import path, listdir
 from datetime import datetime
 from pandas import read_csv
 
-taxi_dir = "data_taxi"
+from globes import taxi_dir
+
 raw_data_path = taxi_dir + "/raw"
 
 dates_read = []

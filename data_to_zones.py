@@ -12,25 +12,13 @@ import sys
 import json
 import shapely.geometry
 
-from globes import taxi_dir, zones_json, zones_prefix
+from globes import taxi_dir, zones_json, zones_prefix, getZoneShapes
 
 
 """ Transform coordinates into zone numbers
 """
-
-def getShapes():
-    shapes = []
-    with open(zones_json) as zone_file:
-        data = json.load(zone_file)
-        zone_data = data['features']
-        for zone in zone_data:
-            shape = {}
-            shape["id"] = zone['properties']['ntacode']
-            shape["object"] = shapely.geometry.shape(zone['geometry'])
-            shapes.append(shape)
-    return shapes
             
-shapes = getShapes()
+shapes = getZoneShapes()
 
 def getShapeFromPoint(row):
     lat = float(row[0])
