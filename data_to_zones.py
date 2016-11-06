@@ -1,22 +1,26 @@
+# data_to_zones.py
+# 
+# transform lat/lng datapoints to zones as given by a geoJSON file
+
 """ Load the hd5 files
 """
 
 from os import path, listdir
 from pandas import read_csv
+import time
 import sys
 import json
 import shapely.geometry
 
+from globes import taxi_dir, zones_json, zones_prefix
 
-taxi_dir = 'data_taxi'
-prefix = "taxi_zones"
 
 """ Transform coordinates into zone numbers
 """
 
 def getShapes():
     shapes = []
-    with open("static/zones2.json") as zone_file:
+    with open(zones_json) as zone_file:
         data = json.load(zone_file)
         zone_data = data['features']
         for zone in zone_data:
@@ -39,15 +43,20 @@ def getShapeFromPoint(row):
     return None
 
 def getZones(df):
+    time1 = time.clock()
     df['pickup_zone'] = df[['pickup_latitude', 'pickup_longitude']].apply(getShapeFromPoint, axis=1)
+    time2 = time.clock()
     df['dropoff_zone'] = df[['dropoff_latitude', 'dropoff_longitude']].apply(getShapeFromPoint, axis=1)
+    time3 = time.clock()
+    print str(len(df)) + " lines in " + str(time2-time1)
+    print str(len(df)) + " lines in " + str(time3-time2)
     return df
 
 if __name__ == "__main__":
     dfs = []
     for filename in listdir(taxi_dir):
-        if filename.endswith(".csv") and "_test" in filename:
+        if filename.endswith(".csv") and zones_prefix not in filename:
             print filename
             df = read_csv(path.join(taxi_dir, filename))
             df = getZones(df)
-            df.to_csv(path.join(taxi_dir, "zones_" + filename))
+            df.to_csv(path.join(taxi_dir, zones_prefix + filename))
