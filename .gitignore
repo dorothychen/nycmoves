@@ -1,4 +1,5 @@
 .DS_Store
+sftp-config.json
 .sass-cache/
 .webassets-cache/
 generated/

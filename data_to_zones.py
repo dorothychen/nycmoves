@@ -16,14 +16,13 @@ prefix = "taxi_zones"
 
 def getShapes():
     shapes = []
-    with open("data_taxi/taxi_zones/zones.json") as zone_file:
+    with open("static/zones2.json") as zone_file:
         data = json.load(zone_file)
         zone_data = data['features']
         for zone in zone_data:
             shape = {}
-            shape["id"] = zone['id']
-            shape["properties"] = zone["properties"]
-            shape["object"] = shapely.geometry.asShape(zone['geometry'])
+            shape["id"] = zone['properties']['ntacode']
+            shape["object"] = shapely.geometry.shape(zone['geometry'])
             shapes.append(shape)
     return shapes
             
@@ -32,10 +31,10 @@ shapes = getShapes()
 def getShapeFromPoint(row):
     lat = float(row[0])
     lng = float(row[1])
-    print lat, lng
     point = shapely.geometry.Point(lng,lat)
     for shape in shapes:
         if shape["object"].contains(point):
+            print lat, lng, shape["id"]
             return shape["id"]
     return None
 
@@ -47,7 +46,7 @@ def getZones(df):
 if __name__ == "__main__":
     dfs = []
     for filename in listdir(taxi_dir):
-        if filename.endswith(".csv") and "2016-01-01" in filename:
+        if filename.endswith(".csv") and "_test" in filename:
             print filename
             df = read_csv(path.join(taxi_dir, filename))
             df = getZones(df)
