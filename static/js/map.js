@@ -32,26 +32,46 @@ d3.json("static/zones2.json", function(error, nyc) {
         .append("path")
         .attr("d", path)
         .attr("id", function(d) { return d.properties.ntacode; })
-        // .attr("id", function(d) { return "n-" + d.id; })
         .attr("class", "border")
+        .attr("fill", "None") // hide at first
         .on("mouseover", borderMouseover)
         .on("mouseout", borderMouseout);
 
     updateColors();
 });
 
-function updateColors() {
-    // var paths = document.getElementsByTagName("path");
-    // color_data = [];
-    // for (var i = 0; i < paths.length; i += 1) {
-    //     color_data.push(0);
-    // }
+// https://en.wikipedia.org/wiki/Logistic_function
+function logistic(x) {
+    var base = 1 + Math.pow(Math.E, -0.3*x);
+    return 1 / base;
+}
 
-    // svg.selectAll("path")
-    //     .data(color_data)
-    //     .style("fill", function(d) {
-    //         return "red";
-    //     });
+/*  given a zone feature object and a dictionary of zone codes => flow values,
+    return color 
+*/
+var color_hot = [229, 93, 135];
+var color_cold = [95, 195, 228];
+function idToColor(p, vals) {
+    var id = p['properties']['ntacode'];
+    percent = logistic(vals[id]);
+
+    rgb = color_hot.map(function(val, i) {
+        var diff = percent * (color_hot[i]-color_cold[i]) + color_cold[i];
+        return Math.round(diff);
+    });
+
+    return 'rgb(' + rgb.join() + ')';
+}
+
+function updateColors() {
+    d3.json('static/diffs_zones_2016-01-01.json', function(err, data) {
+        if (err) return console.log(err);
+
+        // what 2 do with da travel info
+        vals = data['20:34'];
+        svg.selectAll("path")
+            .attr("fill", function(p) { return idToColor(p, vals); } );
+    });
 }
 
 function borderMouseover(d, i, paths) {

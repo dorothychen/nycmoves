@@ -17,7 +17,6 @@ from globes import taxi_dir, zones_json, zones_prefix, getZoneShapes
 
 """ Transform coordinates into zone numbers
 """
-            
 shapes = getZoneShapes()
 
 def getShapeFromPoint(row):
