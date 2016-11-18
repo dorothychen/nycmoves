@@ -45,7 +45,7 @@ def handleDf(df):
 def toMvmt():
     for filename in listdir(taxi_dir):
         if filename.endswith(".csv") and zones_prefix in filename and "01-01" in filename:
-            df = pd.read_csv(path.join(taxi_dir, filename), parse_dates=['pickup_datetime', 'dropoff_datetime'])
+            df = pd.read_csv(path.join(taxi_dir, filename), parse_dates=['pickup_datetime', 'dropoff_datetime'], index_col=0)
             diffs_df = handleDf(df)
             diffs_df.to_csv(path.join(taxi_dir, diffs_prefix + filename))
             

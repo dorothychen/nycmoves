@@ -1,4 +1,4 @@
-# variables.py
+# globes.py
 #
 # config variables and stuff to import into other scripts
 # all dirs and paths relative to main project directory
@@ -8,10 +8,12 @@ import shapely.geometry
 
 citibike_dir = 'data_citibike'
 taxi_dir = 'data_taxi'
-zones_json = 'static/zones2.json'
+zones_json = 'zone_definitions.json'
 
-zones_prefix = "zones_"
-diffs_prefix = "diffs_"
+raw_dir = "raw"
+days_dir = "days"
+zones_dir = "zones"
+# diffs_pre = "diffs_"
 
 def getZoneShapes():
     shapes = []

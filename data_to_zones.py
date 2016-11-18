@@ -12,7 +12,7 @@ import sys
 import json
 import shapely.geometry
 
-from globes import taxi_dir, zones_json, zones_prefix, getZoneShapes
+from globes import taxi_dir, zones_json, zones_dir, getZoneShapes, days_dir
 
 
 """ Transform coordinates into zone numbers
@@ -41,9 +41,9 @@ def getZones(df):
 
 if __name__ == "__main__":
     dfs = []
-    for filename in listdir(taxi_dir):
-        if filename.endswith(".csv") and zones_prefix not in filename:
+    for filename in listdir(path.join(taxi_dir, days_dir)):
+        if filename.endswith(".csv"):
             print filename
-            df = read_csv(path.join(taxi_dir, filename))
+            df = read_csv(path.join(taxi_dir, days_dir, filename), index_col=0)
             df = getZones(df)
-            df.to_csv(path.join(taxi_dir, zones_prefix + filename))
+            df.to_csv(path.join(taxi_dir, zones_dir, filename))
