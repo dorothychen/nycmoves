@@ -4,6 +4,7 @@
 sftp-config.json
 .sass-cache/
 .webassets-cache/
+.ipynb_checkpoints/
 generated/
 data_taxi/
 data_citibike/
