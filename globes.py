@@ -12,20 +12,24 @@ taxi_dir = 'data_taxi'
 zone_files = {
     "nta": {
         "filename": "zones_nta.geojson",
-        "id": "ntacode"
+        "id": "ntacode",
+        "name": "ntaname"
         },
     "taxi": {
         "filename": "zones_taxi.geojson",
-        "id": "LocationID"
+        "id": "LocationID",
+        "name": "zone"
         },
     "zipcode": {
         "filename": "zones_zipcode.geojson",
-        "id": "ZIPCODE"
+        "id": "ZIPCODE",
+        "name": "PO_NAME"
         }
 }
 
 raw_dir = "raw"
 days_dir = "days"
+flow_dir = "flow"
 zones_prefix = "zones_"
 
 """ Transform coordinates into zone numbers
