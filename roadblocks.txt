@@ -1,3 +1,2 @@
-- quickly loading lots of data ***
-- how to determine if a point is in an squiggly boundary?
-    - actually using zones from another source cuz taxi zones are shitty??? the shapefile isn't accurate at all?
+
+- brew installed gdal for ogr2ogr

@@ -22,7 +22,7 @@ var tooltip = d3.select("body")
     .style("visibility", "hidden");
 
 /* make map from json zones file */
-d3.json("static/zones2.json", function(error, nyc) {
+d3.json("static/zones_taxi.geojson", function(error, nyc) {
     if (error) return console.log(error);
 
     // unit projection 
@@ -47,14 +47,14 @@ d3.json("static/zones2.json", function(error, nyc) {
         .enter()
         .append("path")
         .attr("d", path)
-        .attr("id", function(d) { return d.properties.ntacode; })
+        // .attr("id", function(d) { return d.properties.ntacode; })
         .attr("class", "border")
-        .attr("fill", "None") // hide at first
-        .on("mouseover", borderMouseover)
-        .on("mousemove", borderMousemove)
-        .on("mouseout", borderMouseout);
+        .attr("fill", "blue") // hide at first
+        // .on("mouseover", borderMouseover)
+        // .on("mousemove", borderMousemove)
+        // .on("mouseout", borderMouseout);
 
-    updateColors();
+    // updateColors();
 });
 
 /* logistic function to transport inflow/outflow counts into a normalized ratio 
@@ -94,6 +94,8 @@ function updateColors() {
             .attr("fill", function(p) { return idToColor(p, curData); } );
     });
 }
+
+
 
 /* when you mouseover a zone */
 function borderMouseover(d, i, paths) {

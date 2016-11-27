@@ -33,10 +33,23 @@ def clean_data(filename, df):
     df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
     print filename + " from " + str(old_len) + " to " + str(len(df))
 
+def sort_data(filename, df):
+    old_len = len(df)
+    df = df.sort_values(by='pickup_datetime')
+    df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
+    print filename + " from " + str(old_len) + " to " + str(len(df))
+
+
+def rename_zones(filename, df):
+    old_len = len(df)
+    df = df.rename(columns={"pickup_zone": "pickup_zone_nta", "dropoff_zone": "dropoff_zone_nta"})
+    df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
+    print filename + " from " + str(old_len) + " to " + str(len(df))
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "usage: clean_data.py <into-days | clean>"
+        print "usage: clean_data.py <into-days | clean | sort | rename-zones>"
         exit()
 
     option = sys.argv[1]
@@ -54,8 +67,21 @@ if __name__ == "__main__":
             if filename.endswith('.csv'):
                  df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
                  clean_data(filename, df)
+
+    elif option == "sort":
+        for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
+            if filename.endswith(".csv"):
+                df = read_csv(os.path.join(taxi_dir, days_dir, filename), parse_dates=['pickup_datetime', 'dropoff_datetime'], index_col=0)
+                sort_data(filename, df)
+
+    elif option == "rename-zones":
+        for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
+            if filename.endswith(".csv"):
+                df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
+                rename_zones(filename, df)
+
     else:
-        print "usage: clean_data.py <into-days | clean>"     
+        print "usage: clean_data.py <into-days | clean | rename-zones>"
 
 
 

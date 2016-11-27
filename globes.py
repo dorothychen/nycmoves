@@ -8,21 +8,43 @@ import shapely.geometry
 
 citibike_dir = 'data_citibike'
 taxi_dir = 'data_taxi'
-zones_json = 'zone_definitions.json'
+
+zone_files = {
+    "nta": {
+        "filename": "zones_nta.geojson",
+        "id": "ntacode"
+        },
+    "taxi": {
+        "filename": "zones_taxi.geojson",
+        "id": "LocationID"
+        },
+    "zipcode": {
+        "filename": "zones_zipcode.geojson",
+        "id": "ZIPCODE"
+        }
+}
 
 raw_dir = "raw"
 days_dir = "days"
-zones_dir = "zones"
-# diffs_pre = "diffs_"
+zones_prefix = "zones_"
 
-def getZoneShapes():
+""" Transform coordinates into zone numbers
+PARAM OPTIONS (string): nta, taxi, zipcode
+"""
+def getZoneShapes(definition):
+    try:
+        zone_filename = zone_files[definition]["filename"]
+        zone_id = zone_files[definition]["id"]
+    except: 
+        raise Error(definition + " is not a valid zone type")
+
     shapes = []
-    with open(zones_json) as zone_file:
+    with open(zone_filename) as zone_file:
         data = json.load(zone_file)
         zone_data = data['features']
         for zone in zone_data:
             shape = {}
-            shape["id"] = zone['properties']['ntacode']
+            shape["id"] = zone['properties'][zone_id]
             shape["object"] = shapely.geometry.shape(zone['geometry'])
             shapes.append(shape)
     return shapes
