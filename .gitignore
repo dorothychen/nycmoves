@@ -8,3 +8,4 @@ sftp-config.json
 generated/
 data_taxi/
 data_citibike/
+vis_connections/

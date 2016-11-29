@@ -30,6 +30,10 @@ zone_files = {
 raw_dir = "raw"
 days_dir = "days"
 flow_dir = "flow"
+dest_count_dir = "dest_counts"
+
+connections_dir = "vis_connections"
+
 zones_prefix = "zones_"
 
 """ Transform coordinates into zone numbers
@@ -52,3 +56,18 @@ def getZoneShapes(definition):
             shape["object"] = shapely.geometry.shape(zone['geometry'])
             shapes.append(shape)
     return shapes
+
+
+""" Given zone type info, return a dictionary of zoneID => name
+Defaults to taxi zones
+"""
+def zoneIdToName(ZONE_TYPE="taxi", ID_KEY="LocationID", NAME_KEY="zone"):
+    zone_filename = "zones_" + ZONE_TYPE + ".geojson"
+    with open(zone_filename) as zone_file:
+            zone_geojson = json.load(zone_file)
+            zone_geojson = map(lambda x: x["properties"], zone_geojson["features"])
+    zone_data = {-1: "None"}
+    for zone in zone_geojson:
+        zone_data[zone[ID_KEY]] = zone[NAME_KEY]
+    return zone_data
+

@@ -29,7 +29,10 @@ def is_float(x):
 
 def clean_data(filename, df):
     old_len = len(df)
+
+    # get rid of excess title rows
     df = df[df.pickup_latitude.apply(lambda x: is_float(x))]
+
     df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
     print filename + " from " + str(old_len) + " to " + str(len(df))
 
@@ -39,17 +42,25 @@ def sort_data(filename, df):
     df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
     print filename + " from " + str(old_len) + " to " + str(len(df))
 
-
 def rename_zones(filename, df):
     old_len = len(df)
     df = df.rename(columns={"pickup_zone": "pickup_zone_nta", "dropoff_zone": "dropoff_zone_nta"})
     df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
     print filename + " from " + str(old_len) + " to " + str(len(df))
 
+def clean_zones(filename, df):
+    old_len = len(df)
+
+    # get rid of zones that don't exist
+    
+    
+    df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
+    print filename + " from " + str(old_len) + " to " + str(len(df))    
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "usage: clean_data.py <into-days | clean | sort | rename-zones>"
+        print "usage: clean_data.py <into-days | clean-days | sort | rename-zones | clean-zones>"
         exit()
 
     option = sys.argv[1]
@@ -60,13 +71,14 @@ if __name__ == "__main__":
                 write_days(df)
                 
                 # delete original downloaded file to free up space
-                os.remove(os.path.join(taxi_dir, raw_dir, filename))
+                os.remove(os.path.join(taxi_dir, raw_dir, filename))  
+                print "Run `python clean_data.py clean-days` to remove duplicate title lines!"
 
-    elif option == "clean":
+    elif option == "clean-days":
         for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
             if filename.endswith('.csv'):
-                 df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
-                 clean_data(filename, df)
+                df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
+                clean_data(filename, df)
 
     elif option == "sort":
         for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
@@ -80,8 +92,13 @@ if __name__ == "__main__":
                 df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
                 rename_zones(filename, df)
 
+    elif option == "clean-zones":
+        for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
+            if filename.endswith(".csv"):
+                df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
+                clean_zones(filename, df)
     else:
-        print "usage: clean_data.py <into-days | clean | rename-zones>"
+        print "usage: clean_data.py <into-days | clean-days | sort | rename-zones | clean-zones>"
 
 
 
