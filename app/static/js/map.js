@@ -35,8 +35,11 @@ var curData;
 
 /* setup svg for map */
 var svg = d3.select("body").append("svg")
+    .attr("id", "map")
     .attr("width", width)
     .attr("height", height);
+
+var svgElement = document.getElementById("map");
 
 /* setup tooltip for info */
 var tooltip = d3.select("body")
@@ -72,33 +75,37 @@ d3.json(ZONE_FILENAME, function(error, nyc) {
         .enter()
         .append("path")
         .attr("d", path)
-        .attr("id", function(d) { return d['properties'][ZONE_ID]; })
+        .attr("id", function(d) { return "id-" + d['properties'][ZONE_ID]; })
         .attr("class", "border")
         .attr("fill", "None") // hide at first
         .on("mouseover", borderMouseover)
         .on("mousemove", borderMousemove)
-        .on("mouseout", borderMouseout);
+        .on("mouseout", borderMouseout)
+        .on("click", zoneClick);
 
-    updateColors();
+    updateColorsFlow();
 });
 
 /* logistic function to transport inflow/outflow counts into a normalized ratio 
     between 0 and 1.0
     https://en.wikipedia.org/wiki/Logistic_function
 */
-function logistic(x) {
-    var base = 1 + Math.pow(Math.E, -0.2*x);
+function logistic(x, k) {
+    // k is the steepness of the curve; smaller k (in abs val) means wider curve and more sensitivity
+    var base = 1 + Math.pow(Math.E, -k*x);
     return 1 / base;
 }
 
 /*  given a zone feature object and a dictionary of zone codes => flow values,
     return color 
+
+    k is the k value in logistic functions, defaults to 0.2
 */
-var color_hot = [255,95,109];
-var color_cold = [255,195,113];
-function idToColor(p, vals) {
+var color_cold = [250, 250, 250];
+var color_hot = [0,0,0];
+function idToColor(p, vals, k=0.2) {
     var id = p['properties'][ZONE_ID];
-    percent = logistic(vals[id]);
+    percent = logistic(vals[id], k);
 
     rgb = color_hot.map(function(val, i) {
         var diff = percent * (color_hot[i]-color_cold[i]) + color_cold[i];
@@ -108,27 +115,15 @@ function idToColor(p, vals) {
     return 'rgb(' + rgb.join() + ')';
 }
 
-/* read zone flow info and update the color gradients */
-function updateColors() {
-    d3.json('static/zones_2016-01-03.json', function(err, data) {
-        if (err) return console.log(err);
 
-        // what 2 do with da travel info
-        curData = data["12:30"];
-        if (curData == undefined) {
-            console.log(data);
-            return console.log("data undefined");
-        }
-        svg.selectAll("path")
-            .attr("fill", function(p) { return idToColor(p, curData); } );
-    });
+function zoneClick(d, i, paths) {
+    var zoneId = this.id.substring(3);
+    updateColorsDest(zoneId);
 }
-
-
 
 /* when you mouseover a zone */
 function borderMouseover(d, i, paths) {
-    var element = document.getElementById(this.id);
+    var element = svgElement.getElementById(this.id);
     element.classList.add("hovered");
 
     var aggFlow = "";
@@ -150,7 +145,7 @@ function borderMousemove(d, i, paths) {
 
 /* when you mouseout (leave) a zone */
 function borderMouseout(d, i, paths) {
-    var element = document.getElementById(this.id);
+    var element = svgElement.getElementById(this.id);
     element.classList.remove("hovered");
 
     return tooltip.style("visibility", "hidden");

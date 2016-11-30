@@ -3,10 +3,10 @@ import pandas as pd
 from multiprocessing import Pool, Process, cpu_count
 from globes import days_dir, taxi_dir, zoneIdToName, dest_count_dir, connections_dir
 
-## graphing
-import matplotlib.pyplot as plt
-import matplotlib.style
-matplotlib.style.use('ggplot')
+# ## graphing
+# import matplotlib.pyplot as plt
+# import matplotlib.style
+# matplotlib.style.use('ggplot')
 
 INDEX = [-1] + range(1, 264)
 
@@ -76,33 +76,33 @@ def get_agg_dests(filenames):
 
     all_dests.to_csv(os.path.join(taxi_dir, dest_count_dir, filename), mode='w')
 
-""" Output bar graphs that show dropoff zone counts for each pickup zone.
-    Input: filename of csv file of total zone -> dest counts
-"""
-def get_graphs(filename):
-    zone_data = zoneIdToName()
-    filepath = os.path.join(taxi_dir, dest_count_dir, filename)
-    df = pd.read_csv(filepath, index_col=0)
+# """ Output bar graphs that show dropoff zone counts for each pickup zone.
+#     Input: filename of csv file of total zone -> dest counts
+# """
+# def get_graphs(filename):
+#     zone_data = zoneIdToName()
+#     filepath = os.path.join(taxi_dir, dest_count_dir, filename)
+#     df = pd.read_csv(filepath, index_col=0)
 
-    # iterate through each row (aka pickup zone)
-    for pickup_zone, row in df.iterrows():
-        if zone_data.get(pickup_zone):
-            row = row.sort_values(ascending=False)
-            row.index = row.index.astype(int)
+#     # iterate through each row (aka pickup zone)
+#     for pickup_zone, row in df.iterrows():
+#         if zone_data.get(pickup_zone):
+#             row = row.sort_values(ascending=False)
+#             row.index = row.index.astype(int)
             
-            # graph
-            plt.figure(1, figsize=(80,20))
-            ax = row.plot(kind="bar")
-            ax.set_title("2016-01 through 2016-06; trips from zone: " + zone_data[pickup_zone])
-            ax.set_xlabel("dropoff zone")
-            ax.set_ylabel("num dropoffs")
+#             # graph
+#             plt.figure(1, figsize=(80,20))
+#             ax = row.plot(kind="bar")
+#             ax.set_title("2016-01 through 2016-06; trips from zone: " + zone_data[pickup_zone])
+#             ax.set_xlabel("dropoff zone")
+#             ax.set_ylabel("num dropoffs")
             
-            x_labels = get_zone_names(row.index)
-            ax.set_xticklabels(x_labels)
+#             x_labels = get_zone_names(row.index)
+#             ax.set_xticklabels(x_labels)
 
-            # save 
-            graph_path = os.path.join(connections_dir, "taxi" + str(pickup_zone) + '.png')
-            plt.savefig(graph_path, bbox_inches='tight')
+#             # save 
+#             graph_path = os.path.join(connections_dir, "taxi" + str(pickup_zone) + '.png')
+#             plt.savefig(graph_path, bbox_inches='tight')
 
 """ Given filename for matrix of pickup zone -> dropoff zone counts, return a json file
     corresponding pickup zones to dropoff zones and counts
@@ -120,7 +120,7 @@ USAGE = "python get_connection_strength < --agg | --json [input filename] | --gr
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print "usage: " + USAGE
-        return
+        exit()
 
     opt = sys.argv[1]
     if opt == "--agg":

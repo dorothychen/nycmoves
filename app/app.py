@@ -8,6 +8,8 @@ assets = Environment(app)
 # relative to static dir
 js_all = Bundle(
     'js/map.js',
+    'js/netflow.js',
+    'js/destcounts.js',
     output='generated/js_all.js')
 assets.register('js_all', js_all)
 

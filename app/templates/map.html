@@ -3,7 +3,7 @@
 
 
 <head>
-  <title>NYC MOVES</title>
+  <title>NYC MOVEMENT</title>
   {% assets "css_all" %} <link rel="stylesheet" href="{{ ASSET_URL }}"> {% endassets %}
   <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
   <script src="http://d3js.org/topojson.v1.min.js" charset="utf-8"></script>
@@ -11,8 +11,16 @@
 
 <body>
 
-<h1 class="title">NYC MOVES</h>
+<h1 class="title">NYC MOVEMENT</h1>
 
+<div id="reactRoot"></div>
+    
+</div>
+
+<script src="https://unpkg.com/react@15/dist/react.js"></script>
+<script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
+<script type="text/jsx" src="static/js/index.jsx"></script>
 {% assets "js_all" %} <script src="{{ ASSET_URL }}"></script> {% endassets %}
 </body>
 
