@@ -13,6 +13,12 @@ js_all = Bundle(
     output='generated/js_all.js')
 assets.register('js_all', js_all)
 
+jsx_all = Bundle(
+    'js/map.jsx',
+    'js/index.jsx',
+    output="generated/jsx_all.jsx")
+assets.register('jsx_all', jsx_all)
+
 css_all = Bundle(
     'scss/map.scss',
     filters='pyscss',

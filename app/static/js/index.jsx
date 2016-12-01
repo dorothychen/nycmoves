@@ -1,3 +1,4 @@
+
 // MENU
 class Menu extends React.Component {
   constructor(props) {
@@ -7,7 +8,8 @@ class Menu extends React.Component {
   }
 
   handleClick(e) {
-    this.props.stateHandler(e);
+    var mode_value = e.currentTarget.getAttribute("data-mode")
+    this.props.stateHandler(mode_value);
   }
 
   render () {
@@ -53,6 +55,8 @@ class DayPicker extends React.Component {
   }
 }
 
+
+
 // ENTIRE APP
 class App extends React.Component {
   constructor(props) {
@@ -63,25 +67,46 @@ class App extends React.Component {
       days: ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"]
     };
 
+    document.body.classList = [];
+    document.body.classList.add("mode-net-flow");
+
     this.stateHandler = this.stateHandler.bind(this);
   }
 
-  stateHandler(e) {
+  stateHandler(mode_value) {
     this.setState({
-      mode: e.currentTarget.getAttribute("data-mode")
+      mode: mode_value
     });
+    if (mode_value == "NET_FLOW") {
+      document.body.classList = [];
+      document.body.classList.add("mode-net-flow");
+    }
+    else if (mode_value == "DEST_COUNT") {
+      document.body.classList = [];
+      document.body.classList.add("mode-dest-count");
+    }
+  }
+
+  componentDidMount() {
+    document.getElementById("reactRoot").classList.add("mounted")
   }
 
   render() {
     return (
       <div>
-      <div id="menu">
-        <Menu stateHandler={this.stateHandler} mode={this.state.mode} />
-      </div>
-      <div className="sliders">
-          <HourSlider hours={this.state.hours} />
-          <DayPicker days={this.state.days} />
-      </div>
+        <div id="menu">
+          <Menu stateHandler={this.stateHandler} mode={this.state.mode} />
+        </div>
+        <div className="sliders">
+            <HourSlider hours={this.state.hours} />
+            <DayPicker days={this.state.days} />
+        </div>
+        <Map width={window.innerWidth} 
+              height={window.innerHeight} 
+              stateHandler={this.stateHandler}
+              mode={this.state.mode}
+              hours={this.state.hours} 
+              days={this.state.days} />
       </div>
       );
   }

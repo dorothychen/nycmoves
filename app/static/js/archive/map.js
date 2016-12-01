@@ -105,9 +105,9 @@ var color_cold = [250, 250, 250];
 var color_hot = [0,0,0];
 function idToColor(p, vals, k=0.2) {
     var id = p['properties'][ZONE_ID];
-    percent = logistic(vals[id], k);
+    var percent = logistic(vals[id], k);
 
-    rgb = color_hot.map(function(val, i) {
+    var rgb = color_hot.map(function(val, i) {
         var diff = percent * (color_hot[i]-color_cold[i]) + color_cold[i];
         return Math.round(diff);
     });

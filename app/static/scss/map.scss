@@ -4,6 +4,16 @@ html, body {
   font-family: "Open Sans", sans-serif;
 }
 
+body, body.mode-net-flow {
+  transition: background-color 500ms linear;
+  background-color: rgb(224,247,250);
+}
+
+body.mode-dest-count {
+  transition: background-color 500ms linear;
+  background-color: rgb(232,245,233);
+}
+
 .title {
   margin-left: 50px;
   margin-top: 50px;
@@ -11,22 +21,32 @@ html, body {
   font-family: sans-serif;
 }
 
+#reactRoot {
+  opacity: 0;
+}
+
+#reactRoot.mounted {
+  opacity: 1;
+  transition: opacity 1s;
+}
+
+
 svg {
   position: absolute;
   top: 0;
   left: 0;
 
-  path.border {
+  path.zone {
     stroke: white;
     stroke-width: 0.4px;
   }
 
-  path.border.selected {
+  path.zone.selected {
     stroke: lightblue;
     stroke-width: 3px;
   }
 
-  path.border.hovered {
+  path.zone.hovered {
     fill-opacity: 0.6;
   }
 }
