@@ -6,12 +6,12 @@ html, body {
 
 body, body.mode-net-flow {
   transition: background-color 500ms linear;
-  background-color: rgb(224,247,250);
+  background-color: #A1FFCE;
 }
 
 body.mode-dest-count {
   transition: background-color 500ms linear;
-  background-color: rgb(232,245,233);
+  background-color: #FAFFD1;
 }
 
 .title {
@@ -61,7 +61,7 @@ svg {
   .name {
 
   }
-  .agg-flow {
+  .value {
 
   }
 }

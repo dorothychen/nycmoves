@@ -8,7 +8,8 @@ from globes import days_dir, taxi_dir, zoneIdToName, dest_count_dir, connections
 # import matplotlib.style
 # matplotlib.style.use('ggplot')
 
-INDEX = [-1] + range(1, 264)
+ZONE_IDS = [-1] + range(1, 264)
+INDEX = ['pickup_day', 'pickup_hour', 'pickup_zone']
 
 """ Given a dataframe, extract only the relevant feature columns
 """
@@ -43,6 +44,32 @@ def _get_dests(df):
     dests = pd.concat(rows).fillna(0)
     return dests
 
+""" Given df, return dataframe with dest counts for each day, hour, pickup zone
+"""
+def _get_dests_all(df):
+    X = _get_features_df(df)
+
+    day_groups = X.groupby('pickup_day', as_index=False);
+    rows = []
+    for day, day_group in day_groups:
+        hour_groups = day_group.groupby('pickup_hour', as_index=False)
+        for hour, hour_group in hour_groups:
+            grouped = hour_group.groupby('pickup_zone_taxi', as_index=False)
+            for pickup_zone, group in grouped:
+                x = pd.DataFrame(group.groupby('dropoff_zone_taxi', as_index=False).size().rename('count'))
+                x = x.reset_index(level=0)
+                x['pickup_zone'] = pickup_zone
+                
+                x = x.pivot(index='pickup_zone', columns='dropoff_zone_taxi', values='count')
+                x['pickup_zone'] = x.index
+                x['pickup_day'] = day
+                x['pickup_hour'] = hour
+                rows.append(x)
+
+    dests = pd.concat(rows).fillna(0)
+    dests = dests.set_index(INDEX)
+    return dests
+
 """ Given a filename, get the corresponding dataframe and return the destination counts for 
     each pickup zone.
     Used as a helper function, applied on each day's worth of taxi data.
@@ -53,7 +80,7 @@ def _agg_dests_helper(filename):
     df = pd.read_csv(filepath, parse_dates=['pickup_datetime', 'dropoff_datetime'], index_col=0)
 
     starttime = time.time()
-    dests = _get_dests(df)
+    dests = _get_dests_all(df)
     print filename + " processed in " + str(time.time() - starttime) + " seconds"
 
     return dests
@@ -61,7 +88,7 @@ def _agg_dests_helper(filename):
 """ Given a list of filenames, get the total dropoff zone counts for each pickup zones across all files
 """
 def get_agg_dests(filenames):
-    num_cores = cpu_count()/4
+    num_cores = cpu_count()/2
     print "using " + str(num_cores) + " cores"
     pool = Pool(processes=num_cores)
 
@@ -69,47 +96,21 @@ def get_agg_dests(filenames):
     print "num days to aggregate: %d" % len(dests_arr)
 
     # aggregate destination counts
-    all_dests = pd.DataFrame(0, index=INDEX, columns=INDEX)
+    all_dests = pd.DataFrame(0, index=ZONE_IDS, columns=INDEX + ZONE_IDS)
+    all_dests = all_dests.set_index(INDEX)
     for dests in dests_arr:
-        all_dests = all_dests + dests
+        all_dests = all_dests.add(dests, fill_value=0)
         all_dests = all_dests.fillna(0)
 
+    all_dests["all"] = all_dests.sum(axis=0);
     all_dests.to_csv(os.path.join(taxi_dir, dest_count_dir, filename), mode='w')
-
-# """ Output bar graphs that show dropoff zone counts for each pickup zone.
-#     Input: filename of csv file of total zone -> dest counts
-# """
-# def get_graphs(filename):
-#     zone_data = zoneIdToName()
-#     filepath = os.path.join(taxi_dir, dest_count_dir, filename)
-#     df = pd.read_csv(filepath, index_col=0)
-
-#     # iterate through each row (aka pickup zone)
-#     for pickup_zone, row in df.iterrows():
-#         if zone_data.get(pickup_zone):
-#             row = row.sort_values(ascending=False)
-#             row.index = row.index.astype(int)
-            
-#             # graph
-#             plt.figure(1, figsize=(80,20))
-#             ax = row.plot(kind="bar")
-#             ax.set_title("2016-01 through 2016-06; trips from zone: " + zone_data[pickup_zone])
-#             ax.set_xlabel("dropoff zone")
-#             ax.set_ylabel("num dropoffs")
-            
-#             x_labels = get_zone_names(row.index)
-#             ax.set_xticklabels(x_labels)
-
-#             # save 
-#             graph_path = os.path.join(connections_dir, "taxi" + str(pickup_zone) + '.png')
-#             plt.savefig(graph_path, bbox_inches='tight')
 
 """ Given filename for matrix of pickup zone -> dropoff zone counts, return a json file
     corresponding pickup zones to dropoff zones and counts
 """
 def get_json(filename):
-    df = pd.read_csv(filename, index_col=0)
-    df.index.name = "pickup_zone"
+    df = pd.read_csv(filename)
+    df = df.set_index(['pickup_day', 'pickup_hour', 'pickup_zone'])
     json_filename = os.path.splitext(filename)[0] + '.json'
     
     print json_filename

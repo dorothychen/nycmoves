@@ -63,8 +63,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       mode: "NET_FLOW",
-      hours: Array.apply(null, Array(24)).map(function (_, i) {return i;}),
-      days: ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"]
+      hours: Array.apply(null, Array(24)).map(function () {return 1;}),
+      days: Array.apply(null, Array(7)).map(function () {return 1;})
     };
 
     document.body.classList = [];

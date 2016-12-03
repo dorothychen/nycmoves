@@ -58,11 +58,20 @@ class Map extends React.Component {
 		// for some reason this syntax preserves the "this"!!
 		CALLBACKS.getMapData = (data) => {
 			this.setState({map_data: data});
+
+			// get mapping of zoneid => {"name": "", etc.}
+			var zone_metadata = {} 
+			data['features'].forEach(function(zone) {
+				var zoneid = zone['properties'][ZONE_ID];
+				zone_metadata[zoneid] = zone['properties'];
+			});
+
+			this.setState({zone_metadata: zone_metadata});
 		}
 
+		// this.state.color_data should map zoneid => {to_zoneid=>value, etc.}
 		CALLBACKS.getColorData = (data) => {
-			// TODOOOOO; keep only the days of weeks and hours of day that we need
-
+			console.log(data)
 			this.setState({color_data: data});
 		}
 
@@ -75,23 +84,14 @@ class Map extends React.Component {
 		this.getColorData(this.props.mode);
 	}
 
-	// componentDidMount() {
- //    // Get the components DOM node
-	// 	var elem = ReactDOM.findDOMNode(this);
-	// 	elem.style.opacity = 0;
-
-	// 	window.requestAnimationFrame(function() {
-	// 		// Now set a transition on the opacity
-	// 		elem.style.transition = "opacity 250ms";
-	// 		// and set the opacity to 1
-	// 		elem.style.opacity = 1;
-	// 	});
-	// }
 
 	componentWillReceiveProps(nextProps) {
 		// if mode changes, update color scheme
 		if (this.props.mode !== nextProps.mode) {
 			this.getColorData(nextProps.mode);
+			if (nextProps.mode == "NET_FLOW") {
+				this.setState({selected_zone: false});
+			}
 		}
 		
 	}
@@ -109,9 +109,20 @@ class Map extends React.Component {
 			COLOR_FILE = FLOW_FILE;
 		}
 
-		d3.json(COLOR_FILE, function(err, data) {
-			if (err) { console.log(err); }
-			CALLBACKS.getColorData(data);			
+// PREV d3.json METHOD
+		// d3.json(COLOR_FILE, function(err, data) {
+		// 	if (err) { console.log(err); }
+		// 	console.log(data)
+		// 	CALLBACKS.getColorData(data);			
+		// });
+
+		$.get('/api/get_color_data', {
+			hours: this.props.hours.join(),
+			days: this.props.days.join(),
+			mode: mode
+		}, function(data) {
+			var parsed = JSON.parse(data);
+			CALLBACKS.getColorData(parsed);
 		});
 	}
 
@@ -148,26 +159,29 @@ class Map extends React.Component {
 	/**	Tooltip contents for NET_FLOW
 	*/
 	getTooltipHTML(zoneid, mode) {
-		if (!this.state.map_data.features) {
-			console.err("no map data for tooltip");
+		if (!this.state.zone_metadata) {
+			console.error("no map data for tooltip");
 			return;
 		}
 
-		// var zone_data = this.state.map_data.features[zoneid];
-		// var name = zone_data['properties'][ZONE_NAME];
-
-		// if (mode == "NET_FLOW") {
-		// 	var aggFlow = this.state.color;
-		// 	return tooltip.style("visibility", "visible")
-		// 			.html("<span class='name'>" + name + "</span><span class='agg-flow'>" + aggFlow + "</span>");
-		// }
+		var name = this.state.zone_metadata[zoneid][ZONE_NAME];
+		var value = "none"
+		if (this.props.mode == "NET_FLOW") {
+			value = this.state.color_data[zoneid]
+		}
+		else if (this.props.mode == "DEST_COUNT") {
+			value = this.state.color_data[this.state.selected_zone][zoneid]
+		} 
+		 
+		return tooltip.style("visibility", "visible")
+				.html("<span class='name'>" + name + "</span><span class='value'> value: " + value + "</span>");
 	}
 
 	mouseover (e) {
 		e.target.classList.add("hovered");
 		var zoneid = e.target.getAttribute("data-id");
 
-		this.getTooltipHTML(this.props.mode);
+		this.getTooltipHTML(zoneid, this.props.mode);
 	}
 
 	mouseout (e) {
@@ -185,7 +199,6 @@ class Map extends React.Component {
 		this.setState({selected_zone: e.target.getAttribute("data-id")});
 	}
 
-	// if this.props.mode == "NET_FLOW" then state.filename is something, otherwise is something else
 	render() {
 		if (!this.state.map_data) {
 			return false;
@@ -214,16 +227,18 @@ class Map extends React.Component {
 		projection.scale(s).translate(t);
 
 		// for coloring: what is the set of zoneids => number we are using?
-		// TODOOOOOO can get rid of most of this after standardizing color_data
 		var color_vals = this.state.color_data;
 		var k = 0.2;
 		if (this.props.mode == "NET_FLOW" && color_vals != undefined && color_vals != false) {
-			color_vals = this.state.color_data["12:30"];
-			k = 0.2;
+			color_vals = this.state.color_data;
+			k = 0.0002;
 		}
 		else if (this.props.mode == "DEST_COUNT" && this.state.selected_zone) {
 			color_vals = this.state.color_data[this.state.selected_zone];
 			k = 0.001;
+		}
+		else {
+			color_vals = false;
 		}
 
 		var paths = data.features.map((zone, i) => {
@@ -233,7 +248,7 @@ class Map extends React.Component {
 										data-id={zoneId} 
 										className={"zone id-" + zoneId + isSelected} 
 										d={path(zone)}
-										fill={this.idToColor(zone, color_vals, k)}
+										fill={color_vals ? this.idToColor(zone, color_vals, k) : "None"}
 										onMouseOver={this.mouseover}
 										onMouseMove={this.mousemove}
 										onMouseOut={this.mouseout}
