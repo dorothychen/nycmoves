@@ -1,9 +1,8 @@
-import sys
-import os
+import sys, os, json
 from datetime import datetime
 from pandas import read_csv
 
-from globes import taxi_dir, raw_dir, days_dir
+from globes import taxi_dir, raw_dir, days_dir, zoneIdToBorough
 
 dates_read = []
 title_line = ["pickup_datetime", "dropoff_datetime", "trip_distance", "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude", "fare_amount", "passenger_count"]
@@ -48,19 +47,21 @@ def rename_zones(filename, df):
     df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
     print filename + " from " + str(old_len) + " to " + str(len(df))
 
-def clean_zones(filename, df):
-    old_len = len(df)
+def add_boroughs(filename, df):
+    old_shape = df.shape
 
-    # get rid of zones that don't exist
-    
-    
+    data = zoneIdToBorough()
+    df = df.fillna(-1)
+    df["pickup_borough"] = df["pickup_zone_taxi"].apply(lambda zone: data[int(zone)])
+    df["dropoff_borough"] = df["dropoff_zone_taxi"].apply(lambda zone: data[int(zone)])
     df.to_csv(os.path.join(taxi_dir, days_dir, filename), mode='w')
-    print filename + " from " + str(old_len) + " to " + str(len(df))    
+    print filename, old_shape, df.shape
 
 
+USAGE = "usage: clean_data.py <into-days | clean-days | sort | rename-zones | add-boroughs>"
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "usage: clean_data.py <into-days | clean-days | sort | rename-zones | clean-zones>"
+        print USAGE
         exit()
 
     option = sys.argv[1]
@@ -97,8 +98,13 @@ if __name__ == "__main__":
             if filename.endswith(".csv"):
                 df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
                 clean_zones(filename, df)
+    elif option == "add-boroughs":
+        for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
+            if filename.endswith(".csv"):
+                df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
+                add_boroughs(filename, df)
     else:
-        print "usage: clean_data.py <into-days | clean-days | sort | rename-zones | clean-zones>"
+        print USAGE
 
 
 
