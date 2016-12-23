@@ -3,6 +3,7 @@
 # modify trip by trip dataframes to inflow/outflow per zone every <increment> seconds
 
 # time increments, in seconds
+
 import pandas as pd
 import os, sys,time
 from multiprocessing import Pool, Process, cpu_count
@@ -88,7 +89,7 @@ def get_agg_flows(filenames):
         X = X.add(df, fill_value=0)
         X = X.fillna(0)
 
-    X.to_csv(os.path.join(taxi_dir, flow_dir, filename), mode='w')
+    X.to_csv(os.path.join(taxi_dir, flow_dir, "flow.csv"), mode='w')
 
 
 # def toMvmt(to_json=False):
@@ -117,4 +118,3 @@ if __name__ == "__main__":
         print "Creating csv of zone flow"
         filenames = [filename for filename in os.listdir(os.path.join(taxi_dir, days_dir)) if filename.endswith(".csv")]
         get_agg_flows(filenames)
-

@@ -9,6 +9,7 @@ import pandas as pd
 
 from multiprocessing import Pool, Process, cpu_count
 
+taxi_zone_ids = [i for i in range(1, 264) if i not in [57, 104, 105]]
 
 citibike_dir = 'data_citibike'
 taxi_dir = 'data_taxi'
@@ -89,19 +90,20 @@ def zoneIdToBorough(ZONE_TYPE="taxi", ID_KEY="LocationID", BOROUGH_KEY="borough"
     return zone_data
 
 
-
-FEATURE_COLS = ['pickup_day', 'pickup_hour', 'pickup_zone_taxi']
-CLASS_COLS = ['dropoff_zone_taxi']
-
 """ get df for filename
 """
-def get_df_features(filename):
-    print filename
+def get_df(filename):
     df = pd.read_csv(filename, parse_dates=['pickup_datetime', 'dropoff_datetime'])
     df["pickup_day"] = df['pickup_datetime'].apply(lambda t: t.weekday())
     df["pickup_hour"] = df['pickup_datetime'].apply(lambda t: t.hour)
+    df["pickup_zone_taxi"] = df["pickup_zone_taxi"].apply(int)
+    df["dropoff_zone_taxi"] = df["dropoff_zone_taxi"].apply(int)
 
-    df = df[FEATURE_COLS + CLASS_COLS]
+    # get rid of zones that don't actually really exist THIS IS IMPORTANT
+    df = df.loc[df['pickup_zone_taxi'] != -1]
+    df = df.loc[df['dropoff_zone_taxi'] != -1]
+    df = df.dropna()
+
     return df
 
 """ get full df
@@ -114,9 +116,11 @@ def getFullDf():
     filenames = [os.path.join(taxi_dir, days_dir, f) for f in os.listdir(os.path.join(taxi_dir, days_dir)) if f.endswith('csv')]
 
     # get X, y dataframes in parallel
-    dfs = pool.map(get_df_features, filenames)
+    dfs = pool.map(get_df, filenames)
+    pool.terminate()
 
     # concatenate dataframe array into single df
     df = pd.concat(dfs)
     return df
+
 
