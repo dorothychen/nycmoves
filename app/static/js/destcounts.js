@@ -1,6 +1,9 @@
 // global
 var selected_zone;
 
+// current data for selected time/day frame
+var datetimeData;
+
 /* logistic function to transport inflow/outflow counts into a normalized ratio 
     between 0 and 1.0
     https://en.wikipedia.org/wiki/Logistic_function
@@ -45,10 +48,10 @@ function updateTooltip(d) {
     var id = d['properties'][ZONE_ID];
     var name = d['properties'][ZONE_NAME];
 
-    destCount = curData[selected_zone][id];
+    destCount = datetimeData[selected_zone][id];
     
     return tooltip.style("visibility", "visible")
-        .html("<span class='name'>" + name + "</span><span class='value dest-count'>Dropoffs: " + destCount + "</span>");    
+        .html("<span class='name'>" + name + "</span><span class='value dest-count'>Dropoffs: " + destCount.toLocaleString() + "</span>");    
 }
 
 /* when you mouseover a zone */
@@ -121,7 +124,8 @@ function updateColors(hours) {
         if (err) return console.log(err);
 
         // global
-        curData = getData(data, hours);
+        curData = data;
+        datetimeData = getData(data, hours);
 
         if (curData == undefined) {
             console.log(data);
@@ -131,14 +135,8 @@ function updateColors(hours) {
         hideLoading();  
 
         // initially make all zones $darkblue (as defined in map.scss)
-        if (!selected_zone) {
-            svg.selectAll("path")
-                .attr("fill", function(p) { return "#003459" } );
-        }
-        else {
-            svg.selectAll("path")
-                .attr("fill", function(p) { return idToColor(p, curData[selected_zone], 0.001); } );
-        }
+        svg.selectAll("path")
+            .attr("fill", function(p) { return "#003459" } );
 
     });
 }
@@ -146,14 +144,14 @@ function updateColors(hours) {
 // called when you click on a zone
 function updateColorsZone(pickup_zone) {
     if (!curData) {
-        updateColors();
+        console.log("ERROR: updateColorsZone()");
     }
 
     // this is global
     selected_zone = pickup_zone;
 
     svg.selectAll("path")
-        .attr("fill", function(p) { return idToColor(p, curData[pickup_zone], 0.001); } );
+        .attr("fill", function(p) { return idToColor(p, datetimeData[pickup_zone], 0.001); } );
 
     // assign "selected" class to correct element
     var selected = svgElement.getElementsByClassName("selected");
@@ -169,9 +167,24 @@ function hoursChanged(endpoints) {
     for (var i = 0; i < 24; i++) {
         if (i >= endpoints[0] && i < endpoints[1]) { hours[i] = 1; }
     }
-    
+
     showLoading();
-    updateColors(hours);    
+    if (!curData) {
+        updateColors(hours);
+    }
+    else {
+        datetimeData = getData(curData, hours);
+
+        if (!selected_zone) { // initially make all zones $darkblue (as defined in map.scss)
+            svg.selectAll("path")
+                .attr("fill", function(p) { return "#003459" } );
+        }
+        else {
+            svg.selectAll("path")
+                .attr("fill", function(p) { return idToColor(p, datetimeData[selected_zone], 0.001); } );
+        }
+        hideLoading();
+    }
 
 }
 
