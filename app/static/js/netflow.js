@@ -65,9 +65,8 @@ function borderMouseout(d, i, paths) {
 
 
 /* turn aggregate data into ones specified by hours/days */
-function getData(data) {
+function getData(data, hours) {
     var days = Array.apply(null, Array(7)).map(function () {return 1;});
-    var hours = Array.apply(null, Array(24)).map(function () {return 1});
     var title = data[0];
     var filtered = data.slice(1, data.length).filter(function(row) {
         var d = parseInt(row["day"]);
@@ -93,18 +92,42 @@ function getData(data) {
 }
 
 /* read zone flow info and update the color gradients */
-function updateColors() {
+function updateColors(hours) {
     d3.csv('static/netflow.csv', function(err, data) {
         if (err) return console.log(err);
 
         // this is global
-        curData = getData(data);
+        curData = getData(data, hours);
 
         if (curData == undefined) {
             console.log(data);
             return console.log("data undefined");
         }
+
+        hideLoading();
+
         svg.selectAll("path")
             .attr("fill", function(p) { return idToColor(p, curData, 0.0002); } );
     });
 }
+
+function hoursChanged(endpoints) {
+    var hours = Array.apply(null, Array(24)).map(function () {return 0;});
+    for (var i = 0; i < 24; i++) {
+        if (i >= endpoints[0] && i < endpoints[1]) { hours[i] = 1; }
+    }
+    showLoading();
+    updateColors(hours);    
+}
+
+// DATA SLIDERS
+hour_slider.noUiSlider.on('update', function() {
+    document.getElementById("hours").getElementsByClassName("res")[0].innerHTML = hour_slider.noUiSlider.get().join('-');
+});
+
+hour_slider.noUiSlider.on('change', function() {
+    var endpoints = hour_slider.noUiSlider.get();
+    endpoints[0] = parseInt(endpoints[0]);
+    endpoints[1] = parseInt(endpoints[1]);
+    hoursChanged(endpoints);
+});

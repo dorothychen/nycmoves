@@ -34,13 +34,10 @@ function idToColor(p, vals, k=0.2) {
 function zoneClick(d, i, paths) {
     var zoneId = this.id.substring(3);
     updateColorsZone(zoneId);
+    updateTooltip(d);
 }
 
-/* when you mouseover a zone */
-function borderMouseover(d, i, paths) {
-    var element = svgElement.getElementById(this.id);
-    element.classList.add("hovered");
-    
+function updateTooltip(d) {
     if (!curData || !selected_zone) { return; }
     var destCount = "";
     var name = "";
@@ -51,7 +48,14 @@ function borderMouseover(d, i, paths) {
     destCount = curData[selected_zone][id];
     
     return tooltip.style("visibility", "visible")
-        .html("<span class='name'>" + name + "</span><span class='value dest-count'>Dropoffs: " + destCount + "</span>");
+        .html("<span class='name'>" + name + "</span><span class='value dest-count'>Dropoffs: " + destCount + "</span>");    
+}
+
+/* when you mouseover a zone */
+function borderMouseover(d, i, paths) {
+    var element = svgElement.getElementById(this.id);
+    element.classList.add("hovered");
+    updateTooltip(d);
 }
 
 /* when you move your mouse */
@@ -68,9 +72,9 @@ function borderMouseout(d, i, paths) {
 }
 
 /* turn aggregate data into ones specified by hours/days */
-function getData(data) {
+function getData(data, hours) {
     var days = Array.apply(null, Array(7)).map(function () {return 1;});
-    var hours = Array.apply(null, Array(24)).map(function () {return 1});
+    // var hours = Array.apply(null, Array(24)).map(function () {return 1});
     var title = data[0];
     var filtered = data.slice(1, data.length).filter(function(row) {
         var d = parseInt(row["pickup_day"]);
@@ -112,13 +116,30 @@ function getData(data) {
 }
 
 // for initial color
-function updateColors() {
+function updateColors(hours) {
     d3.csv('static/destcount.csv', function(err, data) {
         if (err) return console.log(err);
-        curData = getData(data);
 
-        svg.selectAll("path")
-            .attr("fill", function(p) { return "rgb(144,202,249)" } );
+        // global
+        curData = getData(data, hours);
+
+        if (curData == undefined) {
+            console.log(data);
+            return console.log("data undefined");
+        }
+
+        hideLoading();  
+
+        // initially make all zones $darkblue (as defined in map.scss)
+        if (!selected_zone) {
+            svg.selectAll("path")
+                .attr("fill", function(p) { return "#003459" } );
+        }
+        else {
+            svg.selectAll("path")
+                .attr("fill", function(p) { return idToColor(p, curData[selected_zone], 0.001); } );
+        }
+
     });
 }
 
@@ -128,6 +149,7 @@ function updateColorsZone(pickup_zone) {
         updateColors();
     }
 
+    // this is global
     selected_zone = pickup_zone;
 
     svg.selectAll("path")
@@ -141,3 +163,26 @@ function updateColorsZone(pickup_zone) {
     var element = svgElement.getElementById("id-" + pickup_zone);
     element.classList.add("selected");
 }
+
+function hoursChanged(endpoints) {
+    var hours = Array.apply(null, Array(24)).map(function () {return 0;});
+    for (var i = 0; i < 24; i++) {
+        if (i >= endpoints[0] && i < endpoints[1]) { hours[i] = 1; }
+    }
+    
+    showLoading();
+    updateColors(hours);    
+
+}
+
+// DATA SLIDERS
+hour_slider.noUiSlider.on('update', function() {
+    document.getElementById("hours").getElementsByClassName("res")[0].innerHTML = hour_slider.noUiSlider.get().join('-');
+});
+
+hour_slider.noUiSlider.on('change', function() {
+    var endpoints = hour_slider.noUiSlider.get();
+    endpoints[0] = parseInt(endpoints[0]);
+    endpoints[1] = parseInt(endpoints[1]);
+    hoursChanged(endpoints);
+});

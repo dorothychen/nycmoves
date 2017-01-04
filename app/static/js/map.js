@@ -83,5 +83,52 @@ d3.json(ZONE_FILENAME, function(error, nyc) {
         .on("mouseout", borderMouseout)
         .on("click", zoneClick);
 
-    updateColors();
+    hoursChanged([0, 24]);
+});
+
+function hideLoading() {
+    document.getElementById("loading").classList = "hidden";
+}
+
+function showLoading() {
+    document.getElementById("loading").classList = "";
+}
+
+// RANGE SLIDERS
+var hour_slider = document.getElementById('hour-slider');
+
+noUiSlider.create(hour_slider, {
+    start: [0, 24], // 2 handles, starting at...
+    connect: true, // Display a colored bar between the handles
+    orientation: 'horizontal', 
+    behaviour: 'tap-drag', // Move handle on tap, bar is draggable
+    step: 1,
+    margin: 1,
+    format: {
+        to: function(val) {
+            return Math.round(val) + ":00";
+        },
+        from: function(val) {
+            return val.replace(":00", "");
+        }
+    },
+    range: {
+        'min': 0,
+        'max': 24
+    }
+});
+
+// RANGE SLIDERS
+var day_slider = document.getElementById('day-slider');
+
+noUiSlider.create(day_slider, {
+    start: [0, 7], // 2 handles, starting at...
+    connect: true, // Display a colored bar between the handles
+    orientation: 'horizontal', 
+    behaviour: 'tap-drag', // Move handle on tap, bar is draggable
+    step: 1,
+    range: {
+        'min': 0,
+        'max': 7
+    }
 });

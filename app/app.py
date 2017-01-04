@@ -12,26 +12,22 @@ assets = Environment(app)
 
 # relative to static dir
 js_net_flow = Bundle(
+    'thirdparty/nouislider.min.js',
     'js/map.js',
     'js/netflow.js',
     output='generated/js_net_flow.js')
 assets.register('js_net_flow', js_net_flow)
 
 js_dest_counts = Bundle(
+    'thirdparty/nouislider.min.js',
     'js/map.js',
     'js/destcounts.js',
     output='generated/js_dest_counts.js')
 assets.register('js_dest_counts', js_dest_counts)
 
-
-jsx_all = Bundle(
-    'js/map.jsx',
-    'js/index.jsx',
-    output="generated/jsx_all.jsx")
-assets.register('jsx_all', jsx_all)
-
 css_all = Bundle(
     'scss/map.scss',
+    'thirdparty/nouislider.css',
     filters='pyscss',
     output='generated/css_all.css')
 assets.register('css_all', css_all)

@@ -1,53 +1,45 @@
+$darkblue = #003459;
+$lavender = #EEEEFF;
+$lightblue = #BCCFE0;
+$rose = #F7CAC9;
+$serenity = #92A8D1;
+
 html, body {
   margin: 0;
   padding: 0;
   font-family: "Open Sans", sans-serif;
 }
 
-body, body.mode-net-flow {
-  transition: background-color 500ms linear;
-  background-color: #A1FFCE;
-}
-
-body.mode-dest-count {
-  transition: background-color 500ms linear;
-  background-color: #FAFFD1;
+body {
+  background-color: $lightblue;
 }
 
 .title {
+  color: $darkblue;
+
   margin-left: 50px;
   margin-top: 50px;
   margin-bottom: 0;
   font-family: sans-serif;
 }
 
-#reactRoot {
-  opacity: 0;
-}
-
-#reactRoot.mounted {
-  opacity: 1;
-  transition: opacity 1s;
-}
-
-
 svg {
   position: absolute;
   top: 0;
   left: 0;
 
-  path.zone {
+  path.zone {   
     stroke: white;
     stroke-width: 0.4px;
   }
 
   path.zone.selected {
-    stroke: lightblue;
+    stroke: $rose;
     stroke-width: 3px;
   }
 
   path.zone.hovered {
-    stroke-width: 5px;
+    stroke-width: 3px;
   }
 }
 
@@ -79,6 +71,7 @@ svg {
     span {
       margin: 20px;
       a {
+        color: $darkblue;
         text-decoration: none;
       }
     }
@@ -91,8 +84,53 @@ svg {
     }
 
     span:hover {
-      opacity: 0.8;
-      cursor: pointer;
+      a {
+        opacity: 0.7;
+      }
     }
+  }
+}
+
+#loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+  z-index: 100;
+
+  visibility: visible;
+
+  transition: opacity 500ms linear, visibility 500ms linear;
+}
+
+#loading.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: auto;
+  z-index: -1;
+
+  transition: opacity 500ms linear, visibility 500ms linear;
+}
+
+#sliders {
+  position: absolute;
+  margin-left: 50px;
+  margin-top: 50px;
+  width: 400px;
+}
+
+#sliders > div {
+  margin-bottom: 50px;
+  .title {
+
+  }
+  .res {
+    margin-left: 50px;
+  }
+
+  .noUi-connect {
+    background-color: $rose;
   }
 }
