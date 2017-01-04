@@ -47,7 +47,7 @@ svg {
   }
 
   path.zone.hovered {
-    fill-opacity: 0.6;
+    stroke-width: 5px;
   }
 }
 
@@ -78,10 +78,16 @@ svg {
 
     span {
       margin: 20px;
+      a {
+        text-decoration: none;
+      }
     }
 
     span.selected {
-      text-decoration: underline;
+      a {
+        text-decoration: underline;
+      }
+      
     }
 
     span:hover {

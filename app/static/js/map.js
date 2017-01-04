@@ -76,77 +76,12 @@ d3.json(ZONE_FILENAME, function(error, nyc) {
         .append("path")
         .attr("d", path)
         .attr("id", function(d) { return "id-" + d['properties'][ZONE_ID]; })
-        .attr("class", "border")
+        .attr("class", "zone")
         .attr("fill", "None") // hide at first
         .on("mouseover", borderMouseover)
         .on("mousemove", borderMousemove)
         .on("mouseout", borderMouseout)
         .on("click", zoneClick);
 
-    updateColorsFlow();
+    updateColors();
 });
-
-/* logistic function to transport inflow/outflow counts into a normalized ratio 
-    between 0 and 1.0
-    https://en.wikipedia.org/wiki/Logistic_function
-*/
-function logistic(x, k) {
-    // k is the steepness of the curve; smaller k (in abs val) means wider curve and more sensitivity
-    var base = 1 + Math.pow(Math.E, -k*x);
-    return 1 / base;
-}
-
-/*  given a zone feature object and a dictionary of zone codes => flow values,
-    return color 
-
-    k is the k value in logistic functions, defaults to 0.2
-*/
-var color_cold = [250, 250, 250];
-var color_hot = [0,0,0];
-function idToColor(p, vals, k=0.2) {
-    var id = p['properties'][ZONE_ID];
-    var percent = logistic(vals[id], k);
-
-    var rgb = color_hot.map(function(val, i) {
-        var diff = percent * (color_hot[i]-color_cold[i]) + color_cold[i];
-        return Math.round(diff);
-    });
-
-    return 'rgb(' + rgb.join() + ')';
-}
-
-
-function zoneClick(d, i, paths) {
-    var zoneId = this.id.substring(3);
-    updateColorsDest(zoneId);
-}
-
-/* when you mouseover a zone */
-function borderMouseover(d, i, paths) {
-    var element = svgElement.getElementById(this.id);
-    element.classList.add("hovered");
-
-    var aggFlow = "";
-    var name = "";
-    if (curData) {
-        var id = d['properties'][ZONE_ID];
-        var name = d['properties'][ZONE_NAME];
-
-        aggFlow = curData[id];
-    }
-    return tooltip.style("visibility", "visible")
-        .html("<span class='name'>" + name + "</span><span class='agg-flow'>" + aggFlow + "</span>");
-}
-
-/* when you move your mouse */
-function borderMousemove(d, i, paths) {
-    return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
-}
-
-/* when you mouseout (leave) a zone */
-function borderMouseout(d, i, paths) {
-    var element = svgElement.getElementById(this.id);
-    element.classList.remove("hovered");
-
-    return tooltip.style("visibility", "hidden");
-}

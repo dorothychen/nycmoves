@@ -92,26 +92,11 @@ def get_agg_flows(filenames):
     X.to_csv(os.path.join(taxi_dir, flow_dir, "flow.csv"), mode='w')
 
 
-# def toMvmt(to_json=False):
-#     for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
-#         if filename.endswith(".csv") and "01-03" in filename:
-#             df = pd.read_csv(os.path.join(taxi_dir, days_dir, filename), parse_dates=['pickup_datetime', 'dropoff_datetime'], index_col=0)
-#             diffs_df = dayToFlow(df)
-
-#             # output csv or json
-#             print os.path.splitext(filename)[0]
-#             diffs_df.to_csv(os.path.join(taxi_dir, flow_dir, filename))
-#             if to_json:
-#                 df = pd.read_csv(os.path.join(taxi_dir, flow_dir, filename), index_col=0)
-#                 df.index.name = "datetime"
-#                 json_filename = os.path.splitext(filename)[0] + '.json'
-#                 df.to_json(os.path.join(taxi_dir, flow_dir, json_filename), orient='index')
-            
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         opt = sys.argv[1]
-        if opt == "--json":
+        if opt == "json":
             print "Creating json of zone flow"
             toMvmt(to_json=True)
     else:

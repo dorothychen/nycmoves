@@ -13,15 +13,27 @@
 
 <h1 class="title">NYC MOVEMENT</h1>
 
-<div id="reactRoot"></div>
+<div id="menu" data-mode="{{ mode }}">
+    <div class="wrapper">
+        <span {% if mode=='NET_FLOW' %} class="selected net-flow" {% else %} class="net-flow" {% endif %} >
+          <a href="/net-flow">net flow</a>
+        </span>
+        <span {% if mode=='DEST_COUNT' %} class="selected dest-count" {% else %} class="dest-count" {% endif %}>
+          <a href="/dest-count">destination count</a>
+        </span>
+    </div>
+</div>
+
     
 </div>
 
-<script src="https://unpkg.com/react@15/dist/react.js"></script>
-<script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
-{% assets "jsx_all" %} <script type="text/jsx" src="{{ ASSET_URL }}"></script> {% endassets %}
+{% if mode=="NET_FLOW" %}
+    {% assets "js_net_flow" %} <script src="{{ ASSET_URL }}"></script> {% endassets %}
+{% elif mode=="DEST_COUNT" %}
+    {% assets "js_dest_counts" %} <script src="{{ ASSET_URL }}"></script> {% endassets %}
+{% endif %}
 </body>
 
 

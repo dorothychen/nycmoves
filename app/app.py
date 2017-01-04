@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, url_for
+from flask import Flask, render_template, request, jsonify, url_for, redirect
 from flask_assets import Environment, Bundle
 import pandas as pd
 
@@ -11,12 +11,18 @@ NET_FLOW_FILE = "flow.csv"
 assets = Environment(app)
 
 # relative to static dir
-js_all = Bundle(
+js_net_flow = Bundle(
     'js/map.js',
     'js/netflow.js',
+    output='generated/js_net_flow.js')
+assets.register('js_net_flow', js_net_flow)
+
+js_dest_counts = Bundle(
+    'js/map.js',
     'js/destcounts.js',
-    output='generated/js_all.js')
-assets.register('js_all', js_all)
+    output='generated/js_dest_counts.js')
+assets.register('js_dest_counts', js_dest_counts)
+
 
 jsx_all = Bundle(
     'js/map.jsx',
@@ -29,10 +35,6 @@ css_all = Bundle(
     filters='pyscss',
     output='generated/css_all.css')
 assets.register('css_all', css_all)
-
-@app.route('/')
-def index():
-    return render_template('map.html')
 
 def get_dest_count_data(days, hours):
     df = pd.read_csv(os.path.join(APP_ROOT, 'static', DEST_COUNT_FILE))
@@ -57,6 +59,20 @@ def get_net_flow_data(days, hours):
     df = df.sum()
 
     return jsonify(df.to_json(orient="index"))
+
+@app.route('/')
+def index():
+    return redirect(url_for('net_flow'))
+
+@app.route('/net-flow')
+def net_flow():
+    return render_template('map.html', mode="NET_FLOW")
+
+@app.route('/dest-count')
+def dest_count():
+    return render_template('map.html', mode="DEST_COUNT")
+
+
 
 @app.route('/api/get_color_data', methods=["GET"])
 def get_color_data():
