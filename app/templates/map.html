@@ -21,6 +21,9 @@
         <span {% if mode=='DEST_COUNT' %} class="selected dest-count" {% else %} class="dest-count" {% endif %}>
           <a href="/dest-count">destination count</a>
         </span>
+        <span {% if mode=='CUSTOM' %} class="selected custom" {% else %} class="custom" {% endif %}>
+          <a href="/top-activity">top activity</a>
+        </span>
     </div>
 </div>
 
@@ -49,6 +52,8 @@
     {% assets "js_net_flow" %} <script src="{{ ASSET_URL }}"></script> {% endassets %}
 {% elif mode=="DEST_COUNT" %}
     {% assets "js_dest_counts" %} <script src="{{ ASSET_URL }}"></script> {% endassets %}
+{% elif mode=="CUSTOM" %}
+    {% assets "js_custom" %} <script src="{{ ASSET_URL }}"></script> {% endassets %}
 {% endif %}
 </body>
 

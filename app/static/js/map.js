@@ -83,7 +83,7 @@ d3.json(ZONE_FILENAME, function(error, nyc) {
         .on("mouseout", borderMouseout)
         .on("click", zoneClick);
 
-    hoursChanged([0, 24]);
+    initMapColors([0, 24]);
 });
 
 function hideLoading() {

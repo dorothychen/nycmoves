@@ -11,6 +11,8 @@ export LD_LIBRARY_PATH=/path_to/geos/lib:$LD_LIBRARY_PATH
 
 strip prefix: for f in *.csv; do mv "$f" "${f#zones_}"; done
 
+https://coolors.co/eeeeff-003459-bccfe0-f7cac9-92a8d1
+
 ###### TODO
 - add number of passengers to calculations
 - slider for times

@@ -25,6 +25,13 @@ js_dest_counts = Bundle(
     output='generated/js_dest_counts.js')
 assets.register('js_dest_counts', js_dest_counts)
 
+js_custom = Bundle(
+    'thirdparty/nouislider.min.js',
+    'js/map.js',
+    'js/custom.js',
+    output='generated/custom.js')
+assets.register('js_custom', js_custom)
+
 css_all = Bundle(
     'scss/map.scss',
     'thirdparty/nouislider.css',
@@ -32,29 +39,6 @@ css_all = Bundle(
     output='generated/css_all.css')
 assets.register('css_all', css_all)
 
-def get_dest_count_data(days, hours):
-    df = pd.read_csv(os.path.join(APP_ROOT, 'static', DEST_COUNT_FILE))
-    df = df.loc[df['pickup_day'].isin(days)]
-    df = df.loc[df['pickup_hour'].isin(hours)]
-    df = df.groupby('pickup_zone').sum()
-
-    # drop unneeded columns
-    df = df.drop('pickup_day', 1)
-    df = df.drop('pickup_hour', 1)
-    return jsonify(df.to_json(orient="index"))
-
-def get_net_flow_data(days, hours):
-    df = pd.read_csv(os.path.join(APP_ROOT, 'static', NET_FLOW_FILE))
-    df = df.loc[df['day'].isin(days)]
-    df = df.loc[df['hour'].isin(hours)]
-
-    # drop unneeded columns
-    df = df.drop('day', 1)
-    df = df.drop('hour', 1)
-
-    df = df.sum()
-
-    return jsonify(df.to_json(orient="index"))
 
 @app.route('/')
 def index():
@@ -68,6 +52,13 @@ def net_flow():
 def dest_count():
     return render_template('map.html', mode="DEST_COUNT")
 
+@app.route('/top-activity')
+def top_activity():
+    return redirect(url_for('custom'))
+
+@app.route('/custom')
+def custom():
+    return render_template('map.html', mode="CUSTOM")
 
 
 @app.route('/api/get_color_data', methods=["GET"])

@@ -1,8 +1,6 @@
 # get_flow.py
 # 
-# modify trip by trip dataframes to inflow/outflow per zone every <increment> seconds
-
-# time increments, in seconds
+# modify trip by trip dataframes to inflow/outflow per zone every hour
 
 import pandas as pd
 import os, sys,time
@@ -18,6 +16,9 @@ columns = shapeIds
 ZONE_IDS = [-1] + range(1, 264)
 INDEX = ['day', 'hour']
 
+# flag for if this script outputs the total taxi activity per zone, or the net flow
+# FLOW_TYPE = "NET_FLOW" | "TOTAL_ACTIVITY"
+FLOW_TYPE = "TOTAL_ACTIVITY"
 
 """ Given a grouping of rows with the same minute (or other timeframe), 
     return single-line df with the counts of dropoffs per zone in that time 
@@ -29,7 +30,7 @@ def getRow(t, tgroup, zone_type):
         items[k] = v
     return pd.DataFrame(items, columns=columns, index=[t])
 
-"""
+""" 
 """
 def _dayToFlow(df):
     df['dropoff_zone_taxi'] = df['dropoff_zone_taxi'].fillna(-1).astype("int")
@@ -54,7 +55,10 @@ def _dayToFlow(df):
         pickup_all = pd.concat(pickup_frames)
         pickup_all = pickup_all.fillna(value=0)
 
-        net = dropoff_all - pickup_all
+        if FLOW_TYPE == "NET_FLOW":
+            net = dropoff_all - pickup_all
+        elif FLOW_TYPE == "TOTAL_ACTIVITY":
+            net = dropoff_all + pickup_all
         net['hour'] = net.index
         net['day'] = day
         nets.append(net)
@@ -89,7 +93,7 @@ def get_agg_flows(filenames):
         X = X.add(df, fill_value=0)
         X = X.fillna(0)
 
-    X.to_csv(os.path.join(taxi_dir, flow_dir, "flow.csv"), mode='w')
+    X.to_csv(os.path.join(taxi_dir, flow_dir, "total_activity.csv"), mode='w')
 
 
 

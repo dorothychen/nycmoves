@@ -4,6 +4,10 @@ var selected_zone;
 // current data for selected time/day frame
 var datetimeData;
 
+function initMapColors(hours) {
+    hoursChanged(hours);
+}
+
 /* logistic function to transport inflow/outflow counts into a normalized ratio 
     between 0 and 1.0
     https://en.wikipedia.org/wiki/Logistic_function
