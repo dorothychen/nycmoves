@@ -61,22 +61,5 @@ def custom():
     return render_template('map.html', mode="CUSTOM")
 
 
-@app.route('/api/get_color_data', methods=["GET"])
-def get_color_data():
-    """ color_data should map zoneid => {to_zoneid=>value, etc.}
-    """
-    hours = filter(lambda x: int(request.args['hours'].split(",")[x]) == 1, range(24))
-    days = filter(lambda x: int(request.args['days'].split(",")[x]) == 1, range(7))
-    mode = request.args["mode"]
-
-    if mode == "NET_FLOW":
-        return get_net_flow_data(days, hours)
-    elif mode == "DEST_COUNT":
-        return get_dest_count_data(days, hours)
-    else:
-        return jsonify({})
-
-
-
 if __name__ == "__main__":
     app.run(debug=True)
