@@ -2,6 +2,8 @@
 ### Analyzing and Predicting short-term movement between NYC neighborhoods
 ### Fall 2016 Independent Work (IW03)
 
+To run the visualizer, install the pip dependencies and run `python app/app.py`.
+
 ##### Data Cleaning
 
 - Using trip records from Jan 2016 through June 2016, available to download from the [NYC Transportation and Limousine Commission (TLC) website](http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml).
