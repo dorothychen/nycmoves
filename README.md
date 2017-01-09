@@ -1,23 +1,32 @@
-### NYC Moves
+# NYC Moves
+### Analyzing and Predicting short-term movement between NYC neighborhoods
+### Fall 2016 Independent Work (IW03)
 
-Neighborhood geoJSON file from https://data.cityofnewyork.us/City-Government/Neighborhood-Tabulation-Areas/cpf4-rkhq/data.
+##### Data Cleaning
 
-converted with ogr2ogr (ogr2ogr -f GeoJSON -t_srs crs:84 [name].geojson [name].shp)
-    http://ben.balter.com/2013/06/26/how-to-convert-shapefiles-to-geojson-for-use-on-github/
-taxi_zones ffrom todd schneider github
-zip codes from https://data.cityofnewyork.us/Business/Zip-Code-Boundaries/i8iw-xf4u
+- Using trip records from Jan 2016 through June 2016, available to download from the [NYC Transportation and Limousine Commission (TLC) website](http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml).
+- **process_data.py:** Several small functions run via the command line to clean and modify data.
+- **get_zones.py:** For each trip record, indicate the TLC zone of the pickup and drop-off locations.
 
-export LD_LIBRARY_PATH=/path_to/geos/lib:$LD_LIBRARY_PATH
+##### Exploration
 
-strip prefix: for f in *.csv; do mv "$f" "${f#zones_}"; done
+- **Data exploration.ipynb:** exploratory notebook on the taxi trip records; implementations of most of the *Exploration* section of my paper are here.
+- **get_dest\_counts.py:** Build a csv file where for each hour, day of week, and pickup zone, counts the drop-offs in each drop-off zone. Output used in app.
+- **get_flow.py:** Build a csv file where for each hour and day of week, counts the net taxi trips (drop-offs - pickups) in each zone. Output used in app.
 
-https://coolors.co/eeeeff-003459-bccfe0-f7cac9-92a8d1
 
-###### TODO
-- add number of passengers to calculations
-- slider for times
-- tooltip on hover over each neighborhood
-- track total # ppl in transit (and thus not on the map)
+##### Prediction
+
+- **Regression.ipynb:** Using Random forests and SGD regression to predict a trip's drop-off location given its pickup datetime and location; primarily for playing around with scikit-learn.
+- **grid_search.py:** Grid search and cross-validation functions for random forests and SGD; implementation of results in the *Prediction* section of my paper are here.
+
+##### Other
+
+- **globes.py:** Useful variable declarations and function definitions used in other files.
+- **Network Analysis.ipynb:** Turn taxi trips into edges and neighborhoods into nodes; not used in paper.
+- **zones_\*.geojson:** GeoJSON zone definitions.
+
 
 ##### Dependencies
 Install the python dependencies with `pip install -r requirements.txt`. The shapely package requires the GEOS library, which can be installed via brew, apt-get, yum, or the [official website](https://trac.osgeo.org/geos/).
+

@@ -18,7 +18,7 @@ INDEX = ['day', 'hour']
 
 # flag for if this script outputs the total taxi activity per zone, or the net flow
 # FLOW_TYPE = "NET_FLOW" | "TOTAL_ACTIVITY"
-FLOW_TYPE = "TOTAL_ACTIVITY"
+FLOW_TYPE = "NET_FLOW"
 
 """ Given a grouping of rows with the same minute (or other timeframe), 
     return single-line df with the counts of dropoffs per zone in that time 
@@ -92,18 +92,15 @@ def get_agg_flows(filenames):
     for df in nets_arr:
         X = X.add(df, fill_value=0)
         X = X.fillna(0)
-
-    X.to_csv(os.path.join(taxi_dir, flow_dir, "total_activity.csv"), mode='w')
+    
+    if FLOW_TYPE == "NET_FLOW":
+        X.to_csv(os.path.join(taxi_dir, flow_dir, "netflow.csv"), mode='w')
+    elif FLOW_TYPE == "TOTAL_ACTIVITY":
+        X.to_csv(os.path.join(taxi_dir, flow_dir, "total_activity.csv"), mode='w')
 
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        opt = sys.argv[1]
-        if opt == "json":
-            print "Creating json of zone flow"
-            toMvmt(to_json=True)
-    else:
-        print "Creating csv of zone flow"
-        filenames = [filename for filename in os.listdir(os.path.join(taxi_dir, days_dir)) if filename.endswith(".csv")]
-        get_agg_flows(filenames)
+    print "Creating csv of zone flow"
+    filenames = [filename for filename in os.listdir(os.path.join(taxi_dir, days_dir)) if filename.endswith(".csv")]
+    get_agg_flows(filenames)

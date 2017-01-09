@@ -42,8 +42,7 @@ def get_dest_counts(df=None):
 
 if __name__ == "__main__":
     df = get_dest_counts()
-    df.to_json(os.path.join(taxi_dir, dest_count_dir, "dest_counts.json"), orient="index")
-    df.to_csv(os.path.join(taxi_dir, dest_count_dir, "dest_counts.csv"))
+    df.to_csv(os.path.join(taxi_dir, dest_count_dir, "destcounts.csv"))
 
 
 

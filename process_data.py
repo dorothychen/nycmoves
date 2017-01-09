@@ -92,12 +92,6 @@ if __name__ == "__main__":
             if filename.endswith(".csv"):
                 df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
                 rename_zones(filename, df)
-
-    elif option == "clean-zones":
-        for filename in os.listdir(os.path.join(taxi_dir, days_dir)):
-            if filename.endswith(".csv"):
-                df = read_csv(os.path.join(taxi_dir, days_dir, filename), index_col=0)
-                clean_zones(filename, df)
                 
     elif option == "add-boroughs":
         for filename in os.listdir(os.path.join(taxi_dir, days_dir)):

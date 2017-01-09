@@ -6,6 +6,5 @@ sftp-config.json
 .webassets-cache/
 .ipynb_checkpoints/
 generated/
-data_taxi/
-data_citibike/
-vis_connections/
+data_taxi/days/*
+data_taxi/percent_zones/*

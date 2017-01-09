@@ -3,10 +3,13 @@ import os, sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.metrics import mean_squared_error, make_scorer
-
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.preprocessing import StandardScaler
+from operator import add
 
 from globes import taxi_dir, days_dir
 from multiprocessing import Pool, Process, cpu_count
@@ -101,12 +104,6 @@ def gridSearchRandomForest(X, y, err_func=None):
         grid = GridSearchCV(reg, parameters, cv=6, n_jobs=15, verbose=4, scoring=scorer)
     grid.fit(X, y)
     return grid
-
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.preprocessing import StandardScaler
-from sklearn import linear_model
-from sklearn.model_selection import KFold
-from operator import add
 
 ## alpha = 0.000100, eta0 = 0.001000, RMSE_sum = 0.064487, RMSE = 0.029309, 0.035178, R^2 = 0.267938
 ## fake grid search because of MultiOutputRegressor(linear_model.SGDRegressor()) not taking params properly
