@@ -103,6 +103,13 @@ svg {
   visibility: visible;
 
   transition: opacity 500ms linear, visibility 500ms linear;
+
+  padding: 30px;
+  text-align: center;
+  .loading-container {
+    display: inline-block;
+    padding: 50px;
+  }
 }
 
 #loading.hidden {

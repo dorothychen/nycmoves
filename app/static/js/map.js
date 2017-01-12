@@ -117,18 +117,3 @@ noUiSlider.create(hour_slider, {
         'max': 24
     }
 });
-
-// RANGE SLIDERS
-var day_slider = document.getElementById('day-slider');
-
-noUiSlider.create(day_slider, {
-    start: [0, 7], // 2 handles, starting at...
-    connect: true, // Display a colored bar between the handles
-    orientation: 'horizontal', 
-    behaviour: 'tap-drag', // Move handle on tap, bar is draggable
-    step: 1,
-    range: {
-        'min': 0,
-        'max': 7
-    }
-});
